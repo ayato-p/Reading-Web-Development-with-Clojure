@@ -2,7 +2,8 @@
   (:require [compojure.core :refer :all]
             [guestbook.views.layout :as layout]
             [hiccup.form :refer :all]
-            [guestbook.models.db :as db]))
+            [guestbook.models.db :as db]
+            [noir.session :as session]))
 
 (defn format-time [timestamp]
   (-> "dd/MM/yyyy"
@@ -19,24 +20,14 @@
 
 (defn home [& [name message error]]
   (layout/common
-   [:h1 "Guestbook!!"]
+   [:h1 "Guestbook " (session/get :user)]
    [:p "Welcome to my guestbook"]
    [:p error]
-
-   ;;here we call our show-guests function
-   ;;to generate the list of existing comments
    (show-guests)
    [:hr]
-
-   ;;here we create a form with text fields called "name" and "message"
-   ;;these will be sent when the form posts to the server as keywords of
-   ;;the same name
    (form-to [:post "/"]
-            [:p "Name: "]
-            (text-field "name" name)
-            [:p "Message: "]
-            (text-area {:rows 10 :cols 40} "message" message)
-            [:br]
+            [:p "Name: " (text-field "name" name)]
+            [:p "Message: " (text-area {:rows 10 :cols 40} "message" message)]
             (submit-button "comment"))))
 
 (defn save-message [name message]
@@ -46,5 +37,5 @@
     :else (do (db/save-message name message) (home))))
 
 (defroutes home-routes
-  (GET "/" [] (home))
+  (GET "/" [name message error] (home name message error))
   (POST "/" [name message] (save-message name message)))
