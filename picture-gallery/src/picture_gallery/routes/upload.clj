@@ -39,6 +39,14 @@
      "jpeg"
      (File. (str path thumb-prefix filename)))))
 
+(defn delete-image [userid name]
+  (try
+    (db/delete-image userid name)
+    (io/delete-file (str (gallery-path) File/separator name))
+    (io/delete-file (str (gallery-path) File/separator thumb-prefix name))
+    "ok"
+    (catch Exception ex (.getMessage ex))))
+
 (defn upload-page [info]
   (layout/common
    [:h2 "upload an image"]
@@ -59,11 +67,7 @@
        (save-thumbnail file)
        (db/add-image (session/get :user) filename)
        (image {:height "150px"}
-              (str "/img/"
-                   (session/get :user)
-                   "/"
-                   thumb-prefix
-                   (url-encode filename)))
+              (thumb-uri (session/get :user) filename))
 
        (catch Exception ex
          (str "error uploading file " (.getMessage ex)))))))
@@ -71,8 +75,14 @@
 (defn serve-file [user-id file-name]
   (file-response (str galleries File/separator user-id File/separator file-name)))
 
+(defn delete-images [names]
+  (let [userid (session/get :user)]
+    (resp/json
+     (for [name names] {:name name :status (delete-image userid name)}))))
+
 (defroutes upload-routes
   (GET "/upload" [info] (restricted (upload-page info)))
   (POST "/upload" [file] (restricted (handle-upload file)))
+  (POST "/delete" [names] (restricted) (delete-images names))
   (GET "/img/:user-id/:file-name" [user-id file-name]
        (serve-file user-id file-name)))

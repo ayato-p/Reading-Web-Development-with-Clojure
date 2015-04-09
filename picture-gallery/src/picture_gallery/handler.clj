@@ -1,11 +1,12 @@
 (ns picture-gallery.handler
-  (:require [compojure.core :refer [defroutes routes]]
+  (:require [compojure.core :refer [defroutes]]
             [compojure.route :as route]
-            [picture-gallery.routes.home :refer [home-routes]]
-            [picture-gallery.routes.auth :refer [auth-routes]]
-            [picture-gallery.routes.upload :refer [upload-routes]]
+            [noir.session :as session]
             [noir.util.middleware :as noir-middleware]
-            [noir.session :as session]))
+            [picture-gallery.routes.auth :refer [auth-routes]]
+            [picture-gallery.routes.gallery :refer [gallery-routes]]
+            [picture-gallery.routes.home :refer [home-routes]]
+            [picture-gallery.routes.upload :refer [upload-routes]]))
 
 (defn user-page [_]
   (session/get :user))
@@ -23,6 +24,7 @@
 (def app
   (noir-middleware/app-handler
    [home-routes
+    gallery-routes
     auth-routes
     upload-routes
     app-routes]

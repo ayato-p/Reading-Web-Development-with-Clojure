@@ -1,16 +1,19 @@
 (ns picture-gallery.routes.auth
-  (:require [compojure.core :refer :all]
-            [hiccup.form :refer :all]
+  (:require [clojure.java.io :as io]
+            [compojure.core :refer [GET POST defroutes]]
+            [hiccup.form :refer [form-to label password-field
+                                 submit-button text-field]]
             [noir.response :as response]
             [noir.session :as session]
             [noir.util.anti-forgery :refer [anti-forgery-field]]
             [noir.util.crypt :as crypt]
+            [noir.util.route :refer [restricted]]
             [noir.validation :as vali]
             [picture-gallery.models.db :as db]
-            [picture-gallery.routes.home :refer :all]
-            [picture-gallery.util :refer [gallery-path] ]
+            [picture-gallery.routes.upload :refer [delete-image]]
+            [picture-gallery.util :refer [gallery-path]]
             [picture-gallery.views.layout :as layout])
-  (:import java.io.File))
+  (:import (java.io File)))
 
 (defn create-gallery-path []
   (let [user-path (File. (gallery-path))]
@@ -59,6 +62,15 @@
                      (password-field {:tabindex 3} "pass1"))
             (submit-button {:tabindex 4} "create account"))))
 
+(defn delete-account-page []
+  (layout/common
+   (form-to [:post "/confirm-delete"]
+            (anti-forgery-field)
+            (submit-button "delete account"))
+   (form-to [:get "/"]
+            (anti-forgery-field)
+            (submit-button "cancel"))))
+
 (defn handle-registration [id pass pass1]
   (if (valid? id pass pass1)
     (try
@@ -71,6 +83,15 @@
         (vali/rule false [:id (format-error id ex)])
         (registration-page)))
     (registration-page id)))
+
+(defn handle-confirm-delete []
+  (let [user (session/get :user)]
+    (doseq [{:keys [name]} (db/images-by-user user)]
+      (delete-image user name))
+    (io/delete-file (gallery-path))
+    (db/delete-user user))
+  (session/clear!)
+  (response/redirect "/"))
 
 (defn handle-login [id pass]
   (let [user (db/get-user id)]
@@ -90,4 +111,8 @@
   (POST "/login" [id pass]
         (handle-login id pass))
   (GET "/logout" []
-       (handle-logout)))
+       (handle-logout))
+  (GET "/delete-account" []
+       (restricted (delete-account-page)))
+  (POST "/confirm-delete" []
+        (restricted (handle-confirm-delete))))
