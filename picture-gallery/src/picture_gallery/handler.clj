@@ -1,12 +1,16 @@
 (ns picture-gallery.handler
   (:require [compojure.core :refer [defroutes]]
             [compojure.route :as route]
+            [environ.core :refer [env]]
             [noir.session :as session]
             [noir.util.middleware :as noir-middleware]
             [picture-gallery.routes.auth :refer [auth-routes]]
             [picture-gallery.routes.gallery :refer [gallery-routes]]
             [picture-gallery.routes.home :refer [home-routes]]
             [picture-gallery.routes.upload :refer [upload-routes]]))
+
+(defn enable-anti-forgery []
+  (env :anti-forgery))
 
 (defn user-page [_]
   (session/get :user))
@@ -28,4 +32,6 @@
     auth-routes
     upload-routes
     app-routes]
-   :access-rules [user-page]))
+   :access-rules [user-page]
+   :ring-defaults {:security {:anti-forgery false}}
+   ))

@@ -1,23 +1,23 @@
 (ns picture-gallery.routes.upload
   (:require [clojure.java.io :as io]
-            [compojure.core :refer [defroutes GET POST]]
+            [compojure.core :refer [GET POST defroutes]]
             [hiccup.element :refer [image]]
             [hiccup.form :refer :all]
-            [hiccup.util :refer [url-encode]]
             [noir.io :refer [upload-file]]
             [noir.response :as resp]
             [noir.session :as session]
             [noir.util.anti-forgery :refer [anti-forgery-field]]
             [noir.util.route :refer [restricted]]
             [picture-gallery.models.db :as db]
-            [picture-gallery.util :refer [thumb-size thumb-prefix galleries gallery-path image-uri thumb-uri]]
+            [picture-gallery.util :refer [galleries gallery-path
+                                          thumb-prefix thumb-size
+                                          thumb-uri]]
             [picture-gallery.views.layout :as layout]
             [ring.util.response :refer [file-response]])
-  (:import java.awt.RenderingHints
-           java.awt.geom.AffineTransform
-           [java.awt.image AffineTransformOp BufferedImage]
-           [java.io File FileInputStream FileOutputStream]
-           javax.imageio.ImageIO))
+  (:import (java.awt.geom AffineTransform)
+           (java.awt.image AffineTransformOp BufferedImage)
+           (java.io File)
+           (javax.imageio ImageIO)))
 
 (defn scale [img ratio width height]
   (let [scale (AffineTransform/getScaleInstance
@@ -26,10 +26,10 @@
     (.filter transform-op img (BufferedImage. width height (.getType img)))))
 
 (defn scale-image [file]
-  (let [img (ImageIO/read file)
-        img-width (.getWidth img)
+  (let [img        (ImageIO/read file)
+        img-width  (.getWidth img)
         img-height (.getHeight img)
-        ratio (/ thumb-size img-height)]
+        ratio      (/ thumb-size img-height)]
     (scale img ratio (int (* img-width ratio)) thumb-size)))
 
 (defn save-thumbnail [{:keys [filename]}]

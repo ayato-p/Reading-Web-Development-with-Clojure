@@ -29,6 +29,20 @@ label {
   display: inline-block;
 }
 
+#usermenu a:link {text-decoration: none; color: white;}
+#usermenu a:hover {text-decoration: underline; color: white;}
+#usermenu a:visited {text-decoration: none; color: white;}
+
+.menuitem {
+  color: #D1F0DA;
+  font-size: 15px;
+  font-weight: bold;
+  float: left;
+  list-style: none;
+  padding: 5px;
+  margin: 5px;
+}
+
 .error {
   color: red;
 }
@@ -45,12 +59,21 @@ label {
   -webkit-box-shadow: 4px 4px 6px -1px #222;
 }
 
-.menuitem {
-  float: left;
-  margin-right: 10px;
-}
-
 .content {
   clear: both;
   padding: 20px;
+}
+
+input[type=submit] {
+  background: #99A699;
+  padding: 5px 8px 5px;
+  color: #fff;
+  font-weight: bold;
+  -moz-border-redius: 5px;
+  -webkit-border-redius: 5px;
+  -moz-box-shadow: 0 1px 3px #999;
+  -webkit-box-shadow: 0 1px 3px #999;
+  text-shadow: 0 -1px 1px #222;
+  border-bottom: 1px solid #222;
+  cursor: pointer;
 }

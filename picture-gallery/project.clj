@@ -7,7 +7,8 @@
                  [org.clojure/clojure "1.6.0"]
                  [org.clojure/java.jdbc "0.3.6"]
                  [postgresql/postgresql "9.1-901.jdbc4"]
-                 [ring-server "0.3.1"]]
+                 [ring-server "0.3.1"]
+                 [environ "1.0.0"]]
   :plugins [[lein-ring "0.8.12"]]
   :ring {:handler picture-gallery.handler/app
          :init picture-gallery.handler/init
@@ -16,6 +17,12 @@
   {:uberjar {:aot :all}
    :production
    {:ring
-    {:open-browser? true, :stacktraces? true, :auto-reload? true}}
+    {:open-browser? true, :stacktraces? true, :auto-reload? true}
+    :env {:anti-forgery true}}
    :dev
-   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.3.1"]]}})
+   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.3.1"]]
+    :env {:anti-forgery true}}
+   :test
+   {:env {:anti-forgery false}}
+   }
+  )

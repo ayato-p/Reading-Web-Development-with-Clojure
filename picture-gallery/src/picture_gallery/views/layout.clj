@@ -21,14 +21,16 @@
        (include-css "/css/screen.css")
        [:script {:type "text/javascript"}
         (str "var context=\"" (:context request) "\";")]
-       (include-js "//code.jquery.com/jquery-2.1.3.min.js")]
+       (include-js "//code.jquery.com/jquery-2.1.3.min.js"
+                   "/js/colors.js"
+                   "/js/site.js")]
       [:body content]))))
 
 (defn base [& content]
   (RenderablePage. content))
 
 (defn make-menu [& items]
-  [:div (for [item items] [:div.menuitem item])])
+  [:div#usermenu (for [item items] [:div.menuitem item])])
 
 (defn guest-menu []
   (make-menu
@@ -44,7 +46,7 @@
   (make-menu
    (link-to "/" "home")
    (link-to "/upload" "upload images")
-   (link-to "/logout" (str "logout" user))
+   (link-to "/logout" (str "logout " user))
    (link-to "/delete-account" "delete account")))
 
 (defn common [& content]

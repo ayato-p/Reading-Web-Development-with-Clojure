@@ -1,14 +1,13 @@
-(ns picture-gallery.test.handler
-  (:use clojure.test
-        ring.mock.request
-        picture-gallery.handler))
+;; (ns picture-gallery.test.handler
+;;   (:require [clojure.test :refer :all]
+;;             [noir.util.crypt :refer [encrypt]]
+;;             [noir.util.middleware :as noir-middleware]
+;;             [picture-gallery.handler :refer :all]
+;;             [ring.mock.request :refer :all]))
 
-(deftest test-app
-  (testing "main route"
-    (let [response (app (request :get "/"))]
-      (is (= (:status response) 200))
-      (is (.contains (:body response) "Hello World"))))
+;; (defn mock-get-user [id]
+;;   (if (= id "foo")
+;;     {:id "foo" :pass (encrypt "12345")}))
 
-  (testing "not-found route"
-    (let [response (app (request :get "/invalid"))]
-      (is (= (:status response) 404)))))
+;; (with-redefs [picture-gallery.models.db/get-user mock-get-user]
+;;   (app (request :post "/login" {:id "foo"})))
