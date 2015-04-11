@@ -10,7 +10,8 @@
     {:id "foo" :pass (encrypt "12345")}))
 
 (def app
-  (build-app :ring-defaults {:security {:anti-forgery false}}))
+  (build-app :ring-defaults
+             {:security {:anti-forgery false}}))
 
 (with-redefs [picture-gallery.models.db/get-user mock-get-user]
   (app (request :post "/login" {:id "foo"})))
