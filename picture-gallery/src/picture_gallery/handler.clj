@@ -25,13 +25,14 @@
   (route/resources "/")
   (route/not-found "Not Found"))
 
+(defn build-app [& opts]
+  (apply noir-middleware/app-handler
+         [home-routes
+          gallery-routes
+          auth-routes
+          upload-routes
+          app-routes]
+         opts))
+
 (def app
-  (noir-middleware/app-handler
-   [home-routes
-    gallery-routes
-    auth-routes
-    upload-routes
-    app-routes]
-   :access-rules [user-page]
-   :ring-defaults {:security {:anti-forgery false}}
-   ))
+  (build-app :access-rules [user-page]))
